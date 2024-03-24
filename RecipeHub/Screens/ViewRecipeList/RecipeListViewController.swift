@@ -72,6 +72,7 @@ class RecipeListViewController: UIViewController {
         setupUI()
         setUIBindings()
         setObservers()
+        getInitialRecipeList()
     }
     
     deinit {
@@ -177,6 +178,11 @@ class RecipeListViewController: UIViewController {
         // On tableVie item select
         recipeTableView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
+                let currentRecipe = self?.viewModel.recipies.value[indexPath.row]
+                let recipeDetailsViewModel = RecipeDetailsViewModel(currentRecipe: currentRecipe)
+                let recipeDetailsViewController = RecipeDetailsViewController(viewModel: recipeDetailsViewModel)
+                self?.navigationController?.pushViewController(recipeDetailsViewController,
+                                                               animated: true)
                 self?.recipeTableView.deselectRow(at: indexPath, animated: true)
             })
             .disposed(by: disposeBag)
@@ -198,6 +204,11 @@ class RecipeListViewController: UIViewController {
                                               width: view.frame.width, height: 40))
         toolbar.setItems([cancelButton, flexibleSpace, doneButton], animated: false)
         view.addSubview(toolbar)
+    }
+    
+    private func getInitialRecipeList() {
+        loadingIndicator.startAnimating()
+        viewModel.getRecipeList()
     }
 }
 

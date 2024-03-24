@@ -24,7 +24,7 @@ class RecipeListViewModel: RecipeListViewModelProtocol {
     "Breakfast", "Beverage", "Snack"]
     let apiClient: ApiClientProtocol
     var recipies: BehaviorRelay<[Recipe]> = BehaviorRelay(value: [])
-    var mealType: String = ""
+    var mealType: String = "Dinner"
     var recipiesRecieved = PassthroughSubject<Bool, Never>()
     private var cancellables: Set<AnyCancellable> = []
     

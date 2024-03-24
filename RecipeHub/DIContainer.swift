@@ -15,6 +15,7 @@ extension Container {
         container.register(ApiClientProtocol.self) { _ in ApiClient() }
         container.register(RecipeListViewModelProtocol.self) { _ in RecipeListViewModel() }
         container.register(CreateRecipeViewModelProtocol.self) { _ in CreateRecipeViewModel() }
+        container.register(RecipeDetailsViewModelProtocol.self) { _ in RecipeDetailsViewModel() }
         
         return container
     }()

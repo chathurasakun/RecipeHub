@@ -432,14 +432,16 @@ class CreateRecipeViewController: UIViewController {
         // Bind textView changes to some observer
         addIngredientsTextView.rx.text.orEmpty
             .subscribe(onNext: { [weak self] text in
-                self?.viewModel.ingrediats = [text]
+                let ingrediants = text.seperateStringByComma()
+                self?.viewModel.ingrediats = ingrediants
             })
             .disposed(by: disposeBag)
         
         // Bind textView changes to some observer
         addStepsTextView.rx.text.orEmpty
             .subscribe(onNext: { [weak self] text in
-                self?.viewModel.steps = [text]
+                let steps = text.seperateStringByComma()
+                self?.viewModel.steps = steps
             })
             .disposed(by: disposeBag)
         
