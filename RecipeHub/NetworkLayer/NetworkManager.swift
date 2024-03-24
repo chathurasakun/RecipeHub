@@ -21,6 +21,8 @@ enum APIRouter: ApiConfiguartion {
 //    case authenticate(credentials: LoginRequest)
     case getRecipeLsit(type: String)
     case saveRecipe(recipe: Recipe)
+    case upadateRecipe(recipe: Recipe)
+    case deleteRecipe(id: String)
     
     /// Set Method
     var method: HTTPMethod {
@@ -29,6 +31,10 @@ enum APIRouter: ApiConfiguartion {
             return .get
         case .saveRecipe(_):
             return .post
+        case .upadateRecipe(_):
+            return .patch
+        case .deleteRecipe(_):
+            return .delete
         }
     }
     
@@ -46,6 +52,13 @@ enum APIRouter: ApiConfiguartion {
             return "recipes/save"
 //        case .authenticate(_):
 //            return "auth/login"
+        case .upadateRecipe(recipe: let recipe):
+            if let id = recipe.id {
+                return "recipes/update/\(id)"
+            }
+            return ""
+        case .deleteRecipe(id: let id):
+            return "recipies/delete/\(id)"
         }
     }
     
@@ -63,11 +76,11 @@ enum APIRouter: ApiConfiguartion {
         urlRequest.httpMethod = method.rawValue
     
         switch self {
-        case .saveRecipe(recipe: let recipe):
+        case .saveRecipe(recipe: let recipe), .upadateRecipe(recipe: let recipe):
             urlRequest.httpBody = try JSONEncoder().encode(recipe)
 //        case .authenticate(let credentials):
 //            urlRequest.httpBody = try JSONEncoder().encode(credentials)
-        case .getRecipeLsit(type: _):
+        case .getRecipeLsit(type: _), .deleteRecipe(id: _):
             return try URLEncoding.default.encode(urlRequest, with: nil)
         }
         

@@ -8,14 +8,14 @@ import UIKit
 
 enum AppColors {
     case lightGrayBG
-    case lightGreen
+    case DeepBlue
     
     var value: UIColor {
         switch self {
         case .lightGrayBG:
             return UIColor(named: "lightGrayBG") ?? UIColor.lightGray
-        case .lightGreen:
-            return UIColor(named: "lightGreen") ?? .green
+        case .DeepBlue:
+            return UIColor(named: "DeepBlue") ?? .green
         }
     }
 }

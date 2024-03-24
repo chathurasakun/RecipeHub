@@ -15,7 +15,7 @@ class RecipeHubIndicator: UIActivityIndicatorView {
         super.init(frame: frame)
         
         self.style = .large
-        self.color = AppColors.lightGreen.value
+        self.color = AppColors.DeepBlue.value
     }
     
     required init(coder: NSCoder) {

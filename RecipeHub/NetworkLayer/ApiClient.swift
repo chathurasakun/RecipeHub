@@ -12,6 +12,8 @@ import Alamofire
 protocol ApiClientProtocol {
     func getRecipeList(route: APIRouter) -> AnyPublisher<RecipeResponse, AFError>
     func saveRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
+    func updateRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
+    func deleteRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
 //    func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError>
 }
 
@@ -26,6 +28,24 @@ class ApiClient: ApiClientProtocol {
     }
     
     func saveRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError> {
+        return AF.request(route)
+            .validate()
+            .publishDecodable(type: Recipe.self)
+            .value()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func updateRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError> {
+        return AF.request(route)
+            .validate()
+            .publishDecodable(type: Recipe.self)
+            .value()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func deleteRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError> {
         return AF.request(route)
             .validate()
             .publishDecodable(type: Recipe.self)

@@ -8,10 +8,12 @@
 import UIKit
 import Swinject
 import RxSwift
+import Combine
 
 class EditRecipeViewController: UIViewController {
     var viewModel: EditRecipeViewModelProtocol
     private let disposeBag = DisposeBag()
+    var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Components
     private let updateBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
@@ -180,7 +182,7 @@ class EditRecipeViewController: UIViewController {
     private lazy var flexibleSpace: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
                                                                  target: nil, action: nil)
     
-    private lazy var loadingIndicator: RecipeHubIndicator = {
+    lazy var loadingIndicator: RecipeHubIndicator = {
         let indicator = RecipeHubIndicator(frame: .zero)
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
@@ -204,6 +206,7 @@ class EditRecipeViewController: UIViewController {
         configureUI()
         setUIBindings()
         initMethod()
+        setObservers()
     }
     
     deinit {
@@ -486,6 +489,7 @@ class EditRecipeViewController: UIViewController {
                                           message: "You are going to delete the recipe. Are you sure",
                                           alertViewType: .optional, completionHandler: { okay in
                     if okay {
+                        self?.loadingIndicator.startAnimating()
                         self?.viewModel.deleteRecipe()
                     }
                 })
