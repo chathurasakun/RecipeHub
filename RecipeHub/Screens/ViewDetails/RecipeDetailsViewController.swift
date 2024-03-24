@@ -7,9 +7,11 @@
 
 import UIKit
 import Swinject
+import RxSwift
 
 class RecipeDetailsViewController: UIViewController {
     let viewModel: RecipeDetailsViewModelProtocol
+    private let disposeBag = DisposeBag()
     
     // MARK: - Components
     private let editBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit,
@@ -120,6 +122,7 @@ class RecipeDetailsViewController: UIViewController {
         super.viewDidLoad()
         setUpUI()
         configureUI()
+        setUIBindings()
     }
     
     deinit {
@@ -228,6 +231,17 @@ class RecipeDetailsViewController: UIViewController {
         stepsLabel.text?.concatStrings(array: viewModel.currentRecipe?.instructions ?? [])
     }
     
-    
+    // MARK: - Set UI Bindings
+    private func setUIBindings() {
+        // Create Bar Button
+        editBarButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let editRecipeViewModel = EditRecipeViewModel(currentRecipe: self?.viewModel.currentRecipe)
+                let editRecipeViewController = EditRecipeViewController(viewModel: editRecipeViewModel)
+                self?.navigationController?.pushViewController(editRecipeViewController,
+                                                               animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
     
 }

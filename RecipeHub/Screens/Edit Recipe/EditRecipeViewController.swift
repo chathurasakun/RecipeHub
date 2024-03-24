@@ -1,23 +1,21 @@
 //
-//  CreateRecipeViewController.swift
+//  EditRecipeViewController.swift
 //  RecipeHub
 //
-//  Created by CHATHURA ELLAWALA on 2024-03-23.
+//  Created by CHATHURA ELLAWALA on 2024-03-24.
 //
 
 import UIKit
 import Swinject
 import RxSwift
-import Combine
 
-class CreateRecipeViewController: UIViewController {
-    var viewModel: CreateRecipeViewModelProtocol
+class EditRecipeViewController: UIViewController {
+    var viewModel: EditRecipeViewModelProtocol
     private let disposeBag = DisposeBag()
-    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Components
-    private let saveBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
-                                                                    target: CreateRecipeViewController.self,
+    private let updateBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
+                                                                    target: EditRecipeViewController.self,
                                                                     action: nil)
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -157,6 +155,16 @@ class CreateRecipeViewController: UIViewController {
         return imageView
     }()
     
+    private let deleteRecipeButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Delete Recipe", for: .normal)
+        button.setTitleColor(.red, for: .normal)
+        button.backgroundColor = AppColors.lightGrayBG.value
+        button.layer.cornerRadius = 12
+        return button
+    }()
+    
     private let gapView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -181,7 +189,7 @@ class CreateRecipeViewController: UIViewController {
     private lazy var imagePicker = UIImagePickerController()
     
     // MARK: - Life Cycle
-    init(viewModel: CreateRecipeViewModelProtocol = Container.sharedDIContainer.resolve(CreateRecipeViewModelProtocol.self)!) {
+    init(viewModel: EditRecipeViewModelProtocol = Container.sharedDIContainer.resolve(EditRecipeViewModelProtocol.self)!) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -193,13 +201,13 @@ class CreateRecipeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+        configureUI()
         setUIBindings()
-        setObservers()
         initMethod()
     }
     
     deinit {
-        print("CreateRecipeViewController Deallocated")
+        print("EditRecipeViewController Deallocated")
     }
     
     private func initMethod() {
@@ -208,11 +216,11 @@ class CreateRecipeViewController: UIViewController {
     
     // MARK: - Setup UI
     private func setUpUI() {
+        title = "Update Recipe Details"
         let safeArea = view.safeAreaLayoutGuide
         view.backgroundColor = .white
-        title = "Create New Recipe"
         
-        navigationItem.rightBarButtonItem = saveBarButton
+        navigationItem.rightBarButtonItem = updateBarButton
         
         view.addSubview(scrollView)
         NSLayoutConstraint.activate([
@@ -339,9 +347,18 @@ class CreateRecipeViewController: UIViewController {
                                                           constant: 0)
         ])
         
+        baseView.addSubview(deleteRecipeButton)
+        NSLayoutConstraint.activate([
+            deleteRecipeButton.topAnchor.constraint(equalTo: recipeImageInfoLabel.bottomAnchor,
+                                                    constant: 50),
+            deleteRecipeButton.rightAnchor.constraint(equalTo: baseView.rightAnchor, constant: -15),
+            deleteRecipeButton.heightAnchor.constraint(equalToConstant: 44),
+            deleteRecipeButton.leftAnchor.constraint(equalTo: baseView.leftAnchor, constant: 15)
+        ])
+        
         baseView.addSubview(gapView)
         NSLayoutConstraint.activate([
-            gapView.topAnchor.constraint(equalTo: recipeImageInfoLabel.bottomAnchor, constant: 0),
+            gapView.topAnchor.constraint(equalTo: deleteRecipeButton.bottomAnchor, constant: 0),
             gapView.rightAnchor.constraint(equalTo: baseView.rightAnchor, constant: 0),
             gapView.bottomAnchor.constraint(equalTo: baseView.bottomAnchor, constant: 0),
             gapView.leftAnchor.constraint(equalTo: baseView.leftAnchor, constant: 0),
@@ -355,37 +372,32 @@ class CreateRecipeViewController: UIViewController {
         ])
     }
     
-    // MARK: - Set Observers
-    private func setObservers() {
-        // Hide loadingIndicator after save recipe
-        viewModel.recipeSaved
-            .sink { [weak self] success in
-                self?.loadingIndicator.stopAnimating()
-                if success {
-                    let alertView = AlertView(title: "", message: "Recipe created successfully",
-                                              alertViewType: .determinal, completionHandler: { _ in
-                        self?.navigationController?.popViewController(animated: true)
-                    })
-                    self?.present(alertView, animated: true)
-                } else {
-                    let alertView = AlertView(title: "",
-                                              message: "Unable to create the recipe. Server could" +
-                                              "not process the request this time",
-                                              alertViewType: .determinal,
-                                              completionHandler: { _ in })
-                    self?.present(alertView, animated: true)
-                }
+    // MARK: - Configure UI
+    private func configureUI() {
+        recipeTypeTextField.text?.mergeStrings(array: viewModel.currentRecipe?.mealType ?? [])
+        recipeNameTextField.text = viewModel.currentRecipe?.name ?? ""
+        
+        addIngredientsTextView.addPlaceholder("")  // clear placeholder
+        addIngredientsTextView.text.concatStrings(array: viewModel.currentRecipe?.ingredients ?? [])
+        
+        addStepsTextView.addPlaceholder("")    // clear placeholder
+        addStepsTextView.text.concatStrings(array: viewModel.currentRecipe?.instructions ?? [])
+        
+        if let imageURL = viewModel.currentRecipe?.image {
+            if let URL = URL(string: imageURL) {
+                pickedImageView.load(url: URL)
+                pickedImageView.isHidden = false
             }
-            .store(in: &cancellables)
+        }
     }
     
-    // MARK: - Register UI Bindings
+    // MARK: - Set UI Bindings
     private func setUIBindings() {
         // Create Bar Button
-        saveBarButton.rx.tap
+        updateBarButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.loadingIndicator.startAnimating()
-                self?.viewModel.saveRecipe()
+                self?.viewModel.updateRecipeDetails()
             })
             .disposed(by: disposeBag)
         
@@ -412,7 +424,8 @@ class CreateRecipeViewController: UIViewController {
         recipeTypePicker.rx.itemSelected
             .map { $0.row }
             .subscribe(onNext: { [weak self] value in
-                self?.viewModel.mealType = (self?.viewModel.recipeTypes[value])!
+                let mealTypes = [(self?.viewModel.recipeTypes[value])!]
+                self?.viewModel.currentRecipe?.mealType = mealTypes
                 self?.recipeTypeTextField.text = self?.viewModel.recipeTypes[value]
             })
             .disposed(by: disposeBag)
@@ -436,7 +449,7 @@ class CreateRecipeViewController: UIViewController {
         // Recipe Name textfield
         recipeNameTextField.rx.text.orEmpty
             .subscribe(onNext: { [weak self] text in
-                self?.viewModel.recipeName = text
+                self?.viewModel.currentRecipe?.name = text
             })
             .disposed(by: disposeBag)
         
@@ -444,7 +457,7 @@ class CreateRecipeViewController: UIViewController {
         addIngredientsTextView.rx.text.orEmpty
             .subscribe(onNext: { [weak self] text in
                 let ingrediants = text.seperateStringByComma()
-                self?.viewModel.ingrediats = ingrediants
+                self?.viewModel.currentRecipe?.ingredients = ingrediants
             })
             .disposed(by: disposeBag)
         
@@ -452,7 +465,7 @@ class CreateRecipeViewController: UIViewController {
         addStepsTextView.rx.text.orEmpty
             .subscribe(onNext: { [weak self] text in
                 let steps = text.seperateStringByComma()
-                self?.viewModel.steps = steps
+                self?.viewModel.currentRecipe?.instructions = steps
             })
             .disposed(by: disposeBag)
         
@@ -463,6 +476,20 @@ class CreateRecipeViewController: UIViewController {
         uploadContainerTapGesture.rx.event
             .subscribe(onNext: { [weak self] _ in
                 self?.openImagePicker()
+            })
+            .disposed(by: disposeBag)
+        
+        // Delete Recipe Button
+        deleteRecipeButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let alertView = AlertView(title: "",
+                                          message: "You are going to delete the recipe. Are you sure",
+                                          alertViewType: .optional, completionHandler: { okay in
+                    if okay {
+                        self?.viewModel.deleteRecipe()
+                    }
+                })
+                self?.present(alertView, animated: false)
             })
             .disposed(by: disposeBag)
     }
@@ -484,13 +511,13 @@ class CreateRecipeViewController: UIViewController {
 }
 
 // MARK: - ImagePicker Delegate
-extension CreateRecipeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension EditRecipeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         // This method is called when the user picks an image
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             pickedImageView.image = pickedImage
             pickedImageView.isHidden = false
-            viewModel.recipeImage = pickedImage.toBase64() ?? ""
+            viewModel.currentRecipe?.image = pickedImage.toBase64() ?? ""
         }
         
         picker.dismiss(animated: true, completion: nil)

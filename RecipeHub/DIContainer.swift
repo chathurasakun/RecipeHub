@@ -16,6 +16,7 @@ extension Container {
         container.register(RecipeListViewModelProtocol.self) { _ in RecipeListViewModel() }
         container.register(CreateRecipeViewModelProtocol.self) { _ in CreateRecipeViewModel() }
         container.register(RecipeDetailsViewModelProtocol.self) { _ in RecipeDetailsViewModel() }
+        container.register(EditRecipeViewModelProtocol.self) { _ in EditRecipeViewModel() }
         
         return container
     }()

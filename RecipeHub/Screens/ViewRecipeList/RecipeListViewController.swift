@@ -19,7 +19,7 @@ class RecipeListViewController: UIViewController {
     private var showPickerButton: UIButton = {
         let pickerButton = UIButton()
         pickerButton.translatesAutoresizingMaskIntoConstraints = false
-        pickerButton.setTitle("Select Recipe Type", for: .normal)
+        pickerButton.setTitle("Tap here to select the recipe type", for: .normal)
         pickerButton.setTitleColor(.blue, for: .normal)
         pickerButton.tintColor = .cyan
         return pickerButton
