@@ -18,7 +18,7 @@ protocol ApiConfiguartion: URLRequestConvertible {
 }
 
 enum APIRouter: ApiConfiguartion {
-//    case authenticate(credentials: LoginRequest)
+    case authenticate(credentials: LoginRequest)
     case getRecipeLsit(type: String)
     case saveRecipe(recipe: Recipe)
     case upadateRecipe(recipe: Recipe)
@@ -27,6 +27,8 @@ enum APIRouter: ApiConfiguartion {
     /// Set Method
     var method: HTTPMethod {
         switch self {
+        case .authenticate(_):
+            return .post
         case .getRecipeLsit(_):
             return .get
         case .saveRecipe(_):
@@ -50,8 +52,8 @@ enum APIRouter: ApiConfiguartion {
             return "recipes/meal-type/\(type)"
         case .saveRecipe(_):
             return "recipes/save"
-//        case .authenticate(_):
-//            return "auth/login"
+        case .authenticate(_):
+            return "auth/login"
         case .upadateRecipe(recipe: let recipe):
             if let id = recipe.id {
                 return "recipes/update/\(id)"
@@ -78,8 +80,8 @@ enum APIRouter: ApiConfiguartion {
         switch self {
         case .saveRecipe(recipe: let recipe), .upadateRecipe(recipe: let recipe):
             urlRequest.httpBody = try JSONEncoder().encode(recipe)
-//        case .authenticate(let credentials):
-//            urlRequest.httpBody = try JSONEncoder().encode(credentials)
+        case .authenticate(let credentials):
+            urlRequest.httpBody = try JSONEncoder().encode(credentials)
         case .getRecipeLsit(type: _), .deleteRecipe(id: _):
             return try URLEncoding.default.encode(urlRequest, with: nil)
         }

@@ -16,25 +16,37 @@ protocol RecipeListViewModelProtocol {
     var recipies: BehaviorRelay<[Recipe]> { get set }
     var mealType: String { get set }
     var recipiesRecieved: PassthroughSubject<Bool, Never> { get set }
+    var userLogout: PassthroughSubject<Bool, Never> { get set }
     func sendGetRecipeListRequestToServer()
     func persistRecipies(recipies: [Recipe])
     func getStoredRecipies(completion: @escaping(Bool) -> Void)
+    func logoutUser()
 }
 
 class RecipeListViewModel: RecipeListViewModelProtocol {
     let recipeTypes: [String] = ["Dinner", "Lunch", "Dessert", "Side Dish", "Appetizer", "Snacks",
     "Breakfast", "Beverage", "Snack"]
     let apiClient: ApiClientProtocol
+    let userDefaults: UserdefaultsManagerProtocol
+    let keyChain: KeyChainWrapperProtocol
     let coreDataStorage: CoreDataRecipeStorageProtocol
     var recipies: BehaviorRelay<[Recipe]> = BehaviorRelay(value: [])
     var mealType: String = "Dinner"
     var recipiesRecieved = PassthroughSubject<Bool, Never>()
+    var userLogout = PassthroughSubject<Bool, Never>()
     private var cancellables: Set<AnyCancellable> = []
     
     init(apiClient: ApiClientProtocol = Container.sharedDIContainer.resolve(ApiClientProtocol.self)!,
-         coreDataStorage: CoreDataRecipeStorageProtocol = Container.sharedDIContainer.resolve(CoreDataRecipeStorageProtocol.self)!) {
+         coreDataStorage: CoreDataRecipeStorageProtocol = Container.sharedDIContainer.resolve(CoreDataRecipeStorageProtocol.self)!,
+         userDefaults: UserdefaultsManagerProtocol =
+         Container.sharedDIContainer.resolve(UserdefaultsManagerProtocol.self)!,
+         keyChain: KeyChainWrapperProtocol =
+         Container.sharedDIContainer.resolve(KeyChainWrapperProtocol.self)!
+    ) {
         self.apiClient = apiClient
         self.coreDataStorage = coreDataStorage
+        self.userDefaults = userDefaults
+        self.keyChain = keyChain
     }
     
     func persistRecipies(recipies: [Recipe]) {
@@ -104,5 +116,11 @@ class RecipeListViewModel: RecipeListViewModelProtocol {
                 self?.persistRecipies(recipies: recipies)
             }
             .store(in: &cancellables)
+    }
+    
+    func logoutUser() {
+        userDefaults.setUserLoggedStatus(logged: false)
+        keyChain.deleteValue(forKey: KeyChainKeys.tokenKey)
+        userLogout.send(true)
     }
 }

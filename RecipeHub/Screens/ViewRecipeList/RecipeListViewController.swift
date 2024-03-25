@@ -48,6 +48,8 @@ class RecipeListViewController: UIViewController {
                                                                 target: self, action: nil)
     private lazy var flexibleSpace: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
                                                                  target: nil, action: nil)
+    private var logoutBarButton: UIBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain,
+                                                                   target: RecipeListViewController.self, action: nil)
     private var createBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                                     target: RecipeListViewController.self,
                                                                     action: nil)
@@ -85,6 +87,7 @@ class RecipeListViewController: UIViewController {
         title = "Recipe List"
         view.backgroundColor = .white
         
+        navigationItem.leftBarButtonItem = logoutBarButton
         navigationItem.rightBarButtonItem = createBarButton
         
         view.addSubview(showPickerButton)
@@ -122,10 +125,32 @@ class RecipeListViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
+        
+        // Perform Logout Action
+        viewModel.userLogout
+            .sink { [weak self] success in
+                let loginViewController = LoginViewController()
+                self?.navigationController?.setViewControllers([loginViewController],
+                                                               animated: true)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Register UI Bindings
     private func setUIBindings() {
+        // Logout Bar Button
+        logoutBarButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                let alertView = AlertView(title: "", message: "You are going to logout from the app",
+                                          alertViewType: .optional) { okay in
+                    if okay {
+                        self?.viewModel.logoutUser()
+                    }
+                }
+                self?.present(alertView, animated: false)
+            })
+            .disposed(by: disposeBag)
+        
         // Create Bar Button
         createBarButton.rx.tap
             .subscribe(onNext: { [weak self] in

@@ -14,7 +14,7 @@ protocol ApiClientProtocol {
     func saveRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
     func updateRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
     func deleteRecipe(route: APIRouter) -> AnyPublisher<Recipe, AFError>
-//    func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError>
+    func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError>
 }
 
 class ApiClient: ApiClientProtocol {
@@ -54,12 +54,12 @@ class ApiClient: ApiClientProtocol {
             .eraseToAnyPublisher()
     }
     
-//    func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError> {
-//        return AF.request(route)
-//            .validate()
-//            .publishDecodable(type: LoginResponse.self)
-//            .value()
-//            .receive(on: DispatchQueue.main)
-//            .eraseToAnyPublisher()
-//    }
+    func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError> {
+        return AF.request(route)
+            .validate()
+            .publishDecodable(type: LoginResponse.self)
+            .value()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
 }

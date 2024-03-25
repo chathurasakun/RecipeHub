@@ -14,10 +14,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        var navigationController: UINavigationController
+        
         window = UIWindow(windowScene: windowScene)
         
-        let recipeListViewController = RecipeListViewController()
-        let navigationController = UINavigationController(rootViewController: recipeListViewController)
+        let loggedStatus = UserdefaultsManager().getUserLoggedStatus()
+        if loggedStatus {
+            let recipeListViewController = RecipeListViewController()
+            navigationController = UINavigationController(rootViewController: recipeListViewController)
+        } else {
+            let loginViewController = LoginViewController()
+            navigationController = UINavigationController(rootViewController: loginViewController)
+        }
+        
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }

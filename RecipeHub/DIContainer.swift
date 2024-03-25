@@ -13,7 +13,10 @@ extension Container {
         let container = Container()
         
         container.register(ApiClientProtocol.self) { _ in ApiClient() }
+        container.register(UserdefaultsManagerProtocol.self) { _ in UserdefaultsManager() }
+        container.register(KeyChainWrapperProtocol.self) { _ in KeyChainWrapper() }
         container.register(CoreDataRecipeStorageProtocol.self) { _ in CoreDataRecipeStorage() }
+        container.register(LoginViewModelProtocol.self) { _ in LoginViewModel() }
         container.register(RecipeListViewModelProtocol.self) { _ in RecipeListViewModel() }
         container.register(CreateRecipeViewModelProtocol.self) { _ in CreateRecipeViewModel() }
         container.register(RecipeDetailsViewModelProtocol.self) { _ in RecipeDetailsViewModel() }
