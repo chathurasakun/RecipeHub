@@ -72,7 +72,7 @@ class RecipeListViewController: UIViewController {
         setupUI()
         setUIBindings()
         setObservers()
-        getInitialRecipeList()
+        getRecipeList()
     }
     
     deinit {
@@ -162,8 +162,7 @@ class RecipeListViewController: UIViewController {
             .subscribe(onNext: { [weak self] in
                 self?.recipeTypePicker.removeFromSuperview()
                 self?.view.subviews.last?.removeFromSuperview()
-                self?.loadingIndicator.startAnimating()
-                self?.viewModel.getRecipeList()
+                self?.getRecipeList()
             })
             .disposed(by: disposeBag)
         
@@ -206,9 +205,22 @@ class RecipeListViewController: UIViewController {
         view.addSubview(toolbar)
     }
     
-    private func getInitialRecipeList() {
-        loadingIndicator.startAnimating()
-        viewModel.getRecipeList()
+    private func getRecipeList() {
+        viewModel.getStoredRecipies { fetched in
+            if fetched {
+                if self.viewModel.recipies.value.isEmpty {
+                    DispatchQueue.main.async {
+                        self.loadingIndicator.startAnimating()
+                    }
+                    self.viewModel.sendGetRecipeListRequestToServer()
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    self.recipeTableView.reloadData()
+                }
+            }
+        }
     }
 }
 
