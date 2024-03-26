@@ -51,6 +51,12 @@
 		9D1300C02BB18CEC001284D1 /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300BF2BB18CEC001284D1 /* LoginResponse.swift */; };
 		9D1300C22BB193CA001284D1 /* KeyChainManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300C12BB193CA001284D1 /* KeyChainManger.swift */; };
 		9D1300C42BB1A794001284D1 /* UserdefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300C32BB1A794001284D1 /* UserdefaultsManager.swift */; };
+		9D1300C72BB1B716001284D1 /* LoginViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300C62BB1B716001284D1 /* LoginViewModelTests.swift */; };
+		9D1300CA2BB1B85F001284D1 /* ApiClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300C92BB1B85F001284D1 /* ApiClientMock.swift */; };
+		9D1300CC2BB1BF56001284D1 /* KeyChainMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300CB2BB1BF56001284D1 /* KeyChainMock.swift */; };
+		9D1300CE2BB1C009001284D1 /* UserDefaultsMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300CD2BB1C009001284D1 /* UserDefaultsMock.swift */; };
+		9D1300D02BB2FB64001284D1 /* RecipeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300CF2BB2FB64001284D1 /* RecipeViewModelTests.swift */; };
+		9D1300D22BB2FE2F001284D1 /* CoreDataStorageMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1300D12BB2FE2F001284D1 /* CoreDataStorageMock.swift */; };
 		A6090330F243B7910432C3CB /* Pods_RecipeHub_RecipeHubUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E310492227FD456A41783D6 /* Pods_RecipeHub_RecipeHubUITests.framework */; };
 		F99F6E8DA698EB9C154786D9 /* Pods_RecipeHub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B2A77A26E4E9983E1F34EF9 /* Pods_RecipeHub.framework */; };
 /* End PBXBuildFile section */
@@ -125,6 +131,12 @@
 		9D1300BF2BB18CEC001284D1 /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
 		9D1300C12BB193CA001284D1 /* KeyChainManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainManger.swift; sourceTree = "<group>"; };
 		9D1300C32BB1A794001284D1 /* UserdefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserdefaultsManager.swift; sourceTree = "<group>"; };
+		9D1300C62BB1B716001284D1 /* LoginViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModelTests.swift; sourceTree = "<group>"; };
+		9D1300C92BB1B85F001284D1 /* ApiClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClientMock.swift; sourceTree = "<group>"; };
+		9D1300CB2BB1BF56001284D1 /* KeyChainMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainMock.swift; sourceTree = "<group>"; };
+		9D1300CD2BB1C009001284D1 /* UserDefaultsMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMock.swift; sourceTree = "<group>"; };
+		9D1300CF2BB2FB64001284D1 /* RecipeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeViewModelTests.swift; sourceTree = "<group>"; };
+		9D1300D12BB2FE2F001284D1 /* CoreDataStorageMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStorageMock.swift; sourceTree = "<group>"; };
 		9DA3FE79FCF8350393FA355D /* Pods-RecipeHubTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RecipeHubTests.release.xcconfig"; path = "Target Support Files/Pods-RecipeHubTests/Pods-RecipeHubTests.release.xcconfig"; sourceTree = "<group>"; };
 		B665C3565E427FC4AC5231DB /* Pods-RecipeHub-RecipeHubUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RecipeHub-RecipeHubUITests.release.xcconfig"; path = "Target Support Files/Pods-RecipeHub-RecipeHubUITests/Pods-RecipeHub-RecipeHubUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B94667E2A553510D617FEA05 /* Pods_RecipeHubTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RecipeHubTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,6 +229,8 @@
 		9D13002D2BAE724F001284D1 /* RecipeHubTests */ = {
 			isa = PBXGroup;
 			children = (
+				9D1300C82BB1B843001284D1 /* Mocks */,
+				9D1300C52BB1B69C001284D1 /* ViewModelTests */,
 				9D13002E2BAE724F001284D1 /* RecipeHubTests.swift */,
 			);
 			path = RecipeHubTests;
@@ -369,6 +383,26 @@
 				9D1300BB2BB186BB001284D1 /* LoginViewModel.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		9D1300C52BB1B69C001284D1 /* ViewModelTests */ = {
+			isa = PBXGroup;
+			children = (
+				9D1300C62BB1B716001284D1 /* LoginViewModelTests.swift */,
+				9D1300CF2BB2FB64001284D1 /* RecipeViewModelTests.swift */,
+			);
+			path = ViewModelTests;
+			sourceTree = "<group>";
+		};
+		9D1300C82BB1B843001284D1 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				9D1300C92BB1B85F001284D1 /* ApiClientMock.swift */,
+				9D1300CB2BB1BF56001284D1 /* KeyChainMock.swift */,
+				9D1300CD2BB1C009001284D1 /* UserDefaultsMock.swift */,
+				9D1300D12BB2FE2F001284D1 /* CoreDataStorageMock.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		DAB0068A2DDCBF6F646D4D2D /* Frameworks */ = {
@@ -664,7 +698,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D1300CE2BB1C009001284D1 /* UserDefaultsMock.swift in Sources */,
+				9D1300C72BB1B716001284D1 /* LoginViewModelTests.swift in Sources */,
+				9D1300D22BB2FE2F001284D1 /* CoreDataStorageMock.swift in Sources */,
+				9D1300CA2BB1B85F001284D1 /* ApiClientMock.swift in Sources */,
 				9D13002F2BAE724F001284D1 /* RecipeHubTests.swift in Sources */,
+				9D1300D02BB2FB64001284D1 /* RecipeViewModelTests.swift in Sources */,
+				9D1300CC2BB1BF56001284D1 /* KeyChainMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

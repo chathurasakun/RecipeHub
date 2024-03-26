@@ -11,7 +11,7 @@ import Combine
 protocol LoginViewModelProtocol {
     var username: String { get set }
     var password: String { get set }
-    var loggedSuccessfully: PassthroughSubject<Bool, Never> { get set }
+    var loggedSuccessfully: PassthroughSubject<Bool, Error> { get set }
     func loginUser()
 }
 
@@ -21,7 +21,7 @@ class LoginViewModel: LoginViewModelProtocol {
     let keyChain: KeyChainWrapperProtocol
     var username: String = ""
     var password: String = ""
-    var loggedSuccessfully = PassthroughSubject<Bool, Never>()
+    var loggedSuccessfully = PassthroughSubject<Bool, Error>()
     private var cancellables: Set<AnyCancellable> = []
     
     init(apiClient: ApiClientProtocol = Container.sharedDIContainer.resolve(ApiClientProtocol.self)!,
@@ -39,19 +39,16 @@ class LoginViewModel: LoginViewModelProtocol {
             .sink { [weak self] completion in
                 switch completion {
                 case .failure(let error):
-                    self?.loggedSuccessfully.send(false)
-                    if let code = error.responseCode {
-                        print("code ", code)
+                    guard let code = error.responseCode else {
+                        return
                     }
-                    if error.isSessionTaskError {
-                        print("session Tak error")
-                    }
-                    if error.isResponseSerializationError {
-                        print("serialization error")
+                    if let errorMsg = error.errorDescription {
+                        let error = NSError(domain: "Network Error", code: code,
+                                            userInfo: [NSLocalizedDescriptionKey: errorMsg])
+                        self?.loggedSuccessfully.send(completion: .failure(error))
                     }
                 case .finished:
                     self?.loggedSuccessfully.send(true)
-                    break
                 }
             } receiveValue: { [weak self] response in
                 guard let token = response.token else {

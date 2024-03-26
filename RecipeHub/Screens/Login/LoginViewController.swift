@@ -188,20 +188,25 @@ class LoginViewController: UIViewController {
     // MARK: - Register Observers
     private func setObservers() {
         viewModel.loggedSuccessfully
-            .sink { [weak self] success in
+            .sink(receiveCompletion: { [weak self] completion in
                 self?.loadingIndicator.stopAnimating()
-                if success {
+                
+                switch completion {
+                case .failure(let error):
+                    let alertView = AlertView(title: "Error",
+                                              message: error.localizedDescription,
+                                              alertViewType: .determinal, completionHandler: { _ in})
+                    self?.present(alertView, animated: false)
+                default:
+                    break
+                }
+            }, receiveValue: { [weak self] value in
+                if value {
                     let recipeListViewController = RecipeListViewController()
                     self?.navigationController?.setViewControllers([recipeListViewController],
                                                                    animated: true)
-                } else {
-                    let alertView = AlertView(title: "Error",
-                                              message: "Unable to authenticate" +
-                                              " Please check your username and password.",
-                                              alertViewType: .determinal, completionHandler: { _ in})
-                    self?.present(alertView, animated: false)
                 }
-            }
+            })
             .store(in: &cancellables)
     }
 
