@@ -238,10 +238,18 @@ class RecipeDetailsViewController: UIViewController {
             .subscribe(onNext: { [weak self] in
                 let editRecipeViewModel = EditRecipeViewModel(currentRecipe: self?.viewModel.currentRecipe)
                 let editRecipeViewController = EditRecipeViewController(viewModel: editRecipeViewModel)
+                editRecipeViewController.delegate = self
                 self?.navigationController?.pushViewController(editRecipeViewController,
                                                                animated: true)
             })
             .disposed(by: disposeBag)
     }
     
+}
+
+// MARK: - EditRecipeViewController Delegate
+extension RecipeDetailsViewController: EditRecipeViewControllerProtocol {
+    func dismissViewController() {
+        self.navigationController?.popViewController(animated: true)
+    }
 }

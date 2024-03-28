@@ -18,7 +18,8 @@ extension EditRecipeViewController {
                     let alertView = AlertView(title: "",
                                               message: "Updated recipe successfully.",
                                               alertViewType: .determinal, completionHandler: { _ in
-                            self?.navigationController?.popViewController(animated: true)
+                        self?.delegate?.dismissViewController()
+                        self?.navigationController?.popViewController(animated: true)
                     })
                     self?.present(alertView, animated: false)
                 } else {
@@ -39,6 +40,7 @@ extension EditRecipeViewController {
                     let alertView = AlertView(title: "",
                                               message: "Recipe deleted successfully.",
                                               alertViewType: .determinal, completionHandler: { _ in
+                        self?.delegate?.dismissViewController()
                         self?.navigationController?.popViewController(animated: true)
                     })
                     self?.present(alertView, animated: false)

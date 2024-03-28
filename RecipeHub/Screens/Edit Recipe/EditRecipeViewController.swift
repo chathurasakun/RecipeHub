@@ -10,10 +10,15 @@ import Swinject
 import RxSwift
 import Combine
 
+protocol EditRecipeViewControllerProtocol: AnyObject {
+    func dismissViewController()
+}
+
 class EditRecipeViewController: UIViewController {
     var viewModel: EditRecipeViewModelProtocol
     private let disposeBag = DisposeBag()
     var cancellables: Set<AnyCancellable> = []
+    weak var delegate: EditRecipeViewControllerProtocol?
     
     // MARK: - Components
     private let updateBarButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
