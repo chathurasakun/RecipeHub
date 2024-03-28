@@ -10,7 +10,7 @@ import CoreData
 extension RecipeEntity {
     func toDTO() -> Recipe {
         return Recipe(
-            id: Int(id),
+            id: id,
             name: String(name ?? ""),
             image: String(image ?? ""),
             rating: Double(rating),

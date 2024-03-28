@@ -7,7 +7,7 @@
 import CoreData
 
 struct Recipe: Codable {
-    let id: Int?
+    let id: String?
     var name: String?
     var image: String?
     let rating: Double?
@@ -27,7 +27,7 @@ struct Recipe: Codable {
 extension Recipe {
     func toEntity(in context: NSManagedObjectContext, entity: RecipeEntity) -> RecipeEntity {
         if let id = id {
-            entity.id = Int32(id)
+            entity.id = id
         }
         if let name = name {
             entity.name = name

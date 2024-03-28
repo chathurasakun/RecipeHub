@@ -34,7 +34,7 @@ enum APIRouter: ApiConfiguartion {
         case .saveRecipe(_):
             return .post
         case .upadateRecipe(_):
-            return .patch
+            return .put
         case .deleteRecipe(_):
             return .delete
         }
@@ -42,25 +42,25 @@ enum APIRouter: ApiConfiguartion {
     
     /// Set Base URL
     var baseUrl: String {
-        return "https://dummyjson.com/"
+        return "http://localhost:8080/"
     }
     
     /// End Points
     var endPoint: String {
         switch self {
         case .getRecipeLsit(type: let type):
-            return "recipes/meal-type/\(type)"
+            return "api/recipes/\(type)"
         case .saveRecipe(_):
-            return "recipes/save"
+            return "api/recipes/create"
         case .authenticate(_):
-            return "auth/login"
+            return "api/recipes/login"
         case .upadateRecipe(recipe: let recipe):
             if let id = recipe.id {
-                return "recipes/update/\(id)"
+                return "api/recipes/\(id)"
             }
             return ""
         case .deleteRecipe(id: let id):
-            return "recipies/delete/\(id)"
+            return "api/recipes/\(id)"
         }
     }
     

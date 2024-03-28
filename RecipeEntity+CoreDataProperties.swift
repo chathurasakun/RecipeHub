@@ -2,7 +2,7 @@
 //  RecipeEntity+CoreDataProperties.swift
 //  
 //
-//  Created by CHATHURA ELLAWALA on 2024-03-25.
+//  Created by CHATHURA ELLAWALA on 2024-03-28.
 //
 //
 
@@ -20,7 +20,7 @@ extension RecipeEntity {
     @NSManaged public var cookTimeMinutes: Int32
     @NSManaged public var cuisine: String?
     @NSManaged public var difficulty: String?
-    @NSManaged public var id: Int32
+    @NSManaged public var id: String?
     @NSManaged public var image: String?
     @NSManaged public var ingredients: NSArray?
     @NSManaged public var instructions: NSArray?
