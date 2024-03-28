@@ -77,6 +77,12 @@ class RecipeListViewController: UIViewController {
         getRecipeList()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadingIndicator.startAnimating()
+        viewModel.sendGetRecipeListRequestToServer()
+    }
+    
     deinit {
         print("RecipeListViewController Deallocated")
     }
