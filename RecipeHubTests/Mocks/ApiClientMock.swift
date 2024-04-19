@@ -19,12 +19,12 @@ class ApiClientMock: ApiClientProtocol {
         self.shouldSucceed = shouldSucceed
     }
     
-    let noodles = Recipe(id: 1, name: "Noodles",rating: 4.7, reviewCount: 10, caloriesPerServing: 120,
+    let noodles = Recipe(id: "1", name: "Noodles",rating: 4.7, reviewCount: 10, caloriesPerServing: 120,
                          tags: ["Dinner"],
                          cuisine: "Asian", difficulty: "Easy", prepTimeMinutes: 10,
                          cookTimeMinutes: 12,
                          servings: 4)
-    let pizza = Recipe(id: 2, name: "Pizza",rating: 4.3, reviewCount: 22, caloriesPerServing: 320,
+    let pizza = Recipe(id: "2", name: "Pizza",rating: 4.3, reviewCount: 22, caloriesPerServing: 320,
                        tags: ["Dinner"],
                        cuisine: "Chinese", difficulty: "Easy", prepTimeMinutes: 20,
                        cookTimeMinutes: 20,
@@ -69,15 +69,14 @@ class ApiClientMock: ApiClientProtocol {
     
     func loginUser(route: APIRouter) -> AnyPublisher<LoginResponse, AFError> {
         if shouldSucceed {
-            let mockSuccessSubject = PassthroughSubject<LoginResponse, AFError>()
             let successResponse = LoginResponse(id: 1, username: "testuser", email: "test@gmail.com", firstName: "test", lastName: "User", gender: "male", image: "", token: "testValue")
-            mockSuccessSubject.send(successResponse)
-            mockSuccessSubject.send(completion: .finished)
-            return mockSuccessSubject.eraseToAnyPublisher()
+            return Just(successResponse)
+                .setFailureType(to: AFError.self)
+                .eraseToAnyPublisher()
         } else {
-            let mockFailureSubject = PassthroughSubject<LoginResponse, AFError>()
-            mockFailureSubject.send(completion: .failure(.explicitlyCancelled))
-            return mockFailureSubject.eraseToAnyPublisher()
+            let error = NSError(domain: "Error", code: 200,
+                                userInfo: [NSLocalizedDescriptionKey: "session task error"])
+            return Fail(error: .sessionTaskFailed(error: error)).eraseToAnyPublisher()
         }
     }
 }

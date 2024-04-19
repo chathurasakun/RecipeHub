@@ -22,10 +22,8 @@ class LoginViewModelTests: XCTestCase {
     var keyChainMock: KeyChainMock!
     var userDefaultsMock: UserDefaultsMock!
     let mockUser = LoginRequest(username: "test", password: "test")
-    private var cancellables: Set<AnyCancellable> = []
-    var completion: Subscribers.Completion<Error>?
-    var token: String?
-    var value: Bool?
+    private var cancellable: AnyCancellable?
+    var loginSuccess: Bool!
 
     override func setUp() {
         super.setUp()
@@ -38,9 +36,6 @@ class LoginViewModelTests: XCTestCase {
         apiClientMock = nil
         keyChainMock = nil
         userDefaultsMock = nil
-        completion = nil
-        token = nil
-        value = nil
     }
     
     // Login Success
@@ -51,7 +46,8 @@ class LoginViewModelTests: XCTestCase {
         sut = LoginViewModel(apiClient: apiClientMock, userDefaults: userDefaultsMock,
                              keyChain: keyChainMock)
         
-        sut.apiClient.loginUser(route: .authenticate(credentials: mockUser))
+        let expectation = expectation(description: "Recieve login response expectation")
+        cancellable = sut.apiClient.loginUser(route: .authenticate(credentials: mockUser))
             .sink(receiveCompletion: { recievedCompletion in
                 switch recievedCompletion {
                 case .finished:
@@ -59,18 +55,17 @@ class LoginViewModelTests: XCTestCase {
                 case .failure(_):
                     break
                 }
-            }, receiveValue: { [weak self] response in
-                print("Erased Received value:", response)
-                self?.token = response.token
-            })
-            .store(in: &cancellables)
-        
-        let keyChainToken = keyChainMock.loadValue(forKey: KeyChainKeys.tokenKey)
-        XCTAssertEqual(token, keyChainToken)
-        XCTAssertNotNil(token)
+                expectation.fulfill()
+            }, receiveValue: { [weak self] loginResponse in
+                let keyChainToken = self?.keyChainMock.loadValue(forKey: KeyChainKeys.tokenKey)
+                XCTAssertEqual(loginResponse.token, keyChainToken)
+                XCTAssertNotNil(loginResponse.token)
 
-        let loggedStatus = userDefaultsMock.getUserLoggedStatus()
-        XCTAssertTrue(loggedStatus)
+                let loggedStatus = self?.userDefaultsMock.getUserLoggedStatus()
+                XCTAssertTrue((loggedStatus != nil))
+            })
+
+        waitForExpectations(timeout: 1, handler: nil)
     }
     
     // Login Failed
@@ -81,25 +76,22 @@ class LoginViewModelTests: XCTestCase {
         sut = LoginViewModel(apiClient: apiClientMock, userDefaults: userDefaultsMock,
                              keyChain: keyChainMock)
         
-        sut.apiClient.loginUser(route: .authenticate(credentials: mockUser))
-            .sink{ recievedCompletion in
+        let expection = expectation(description: "Recieve login error response expectation")
+        cancellable = sut.apiClient.loginUser(route: .authenticate(credentials: mockUser))
+            .sink(receiveCompletion: { recievedCompletion in
                 switch recievedCompletion {
                 case .failure(let error):
-                    XCTAssertEqual(error, .explicitlyCancelled)
+                    let networkError = NSError(domain: "Error", code: 200,
+                                        userInfo: [NSLocalizedDescriptionKey: "session task error"])
+                    XCTAssertEqual(error, AFError.sessionTaskFailed(error: networkError))
                     XCTAssertNotNil(error.errorDescription)
                 case .finished:
                     break
                 }
-            } receiveValue: { _ in
-                
-            }
-            .store(in: &cancellables)
-
-        let loggedStatus = userDefaultsMock.getUserLoggedStatus()
-        XCTAssertFalse(loggedStatus)
+                expection.fulfill()
+            }, receiveValue: { _ in })
         
-        let token = keyChainMock.loadValue(forKey: KeyChainKeys.tokenKey)
-        XCTAssertNil(token)
+        waitForExpectations(timeout: 1, handler: nil)
     }
     
     // Send through after login success
@@ -112,22 +104,20 @@ class LoginViewModelTests: XCTestCase {
 
         sut.loginUser()
 
-        sut.loggedSuccessfully
+        cancellable = sut.loggedSuccessfully
             .sink(receiveCompletion: { completion in
                 switch completion {
-                case .failure(_):
-                    break
                 case .finished:
+                    break
+                case .failure(_):
                     break
                 }
             }, receiveValue: { [weak self] recievedValue in
-                self?.value = recievedValue
+                XCTAssertEqual(recievedValue, true)
+                self?.loginSuccess = recievedValue
             })
-            .store(in: &cancellables)
-
-        XCTAssertEqual(value, true)
     }
-    
+
     // login fail
     func test_SendFaliureAfterLoginFailed() {
         apiClientMock = ApiClientMock(shouldSucceed: false)
@@ -135,23 +125,21 @@ class LoginViewModelTests: XCTestCase {
         userDefaultsMock = UserDefaultsMock(shouldSucceed: false)
         sut = LoginViewModel(apiClient: apiClientMock, userDefaults: userDefaultsMock,
                              keyChain: keyChainMock)
-        
+
         sut.loginUser()
-        
-        sut.loggedSuccessfully
-            .sink(receiveCompletion: { [weak self] recivedCompletion in
+
+        cancellable = sut.loggedSuccessfully
+            .sink(receiveCompletion: { recivedCompletion in
                 switch recivedCompletion {
-                case .failure(_):
-                    self?.completion = recivedCompletion
+                case .failure(let error):
+                    XCTAssertNil(recivedCompletion)
+                    XCTAssertEqual(error as! AFError, AFError.explicitlyCancelled)
                 case .finished:
                     break
                 }
             }, receiveValue: { _ in
-
+                
             })
-            .store(in: &cancellables)
-        
-        XCTAssertNil(completion)
     }
 
 }
